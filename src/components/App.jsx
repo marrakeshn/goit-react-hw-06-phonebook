@@ -1,16 +1,94 @@
-export const App = () => {
+import React, { useState, useEffect } from 'react';
+import shortid from 'shortid';
+import styles from './App.module.css';
+import ContactList from './ContactList/ContactList';
+import ContactForm from './ContactForm';
+import Filter from './Filter';
+import Notification from './Notification';
+
+export default function App() {
+  const [contacts, setContacts ] = useState(
+    JSON.parse(localStorage.getItem('contacts')) ?? []
+  );
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const addContact = ({ name, number }) => {
+    const normalizedName = name.toLowerCase();
+
+    let isAdded = false;
+    contacts.forEach(el => {
+      if (el.name.toLowerCase() === normalizedName) {
+        alert(`${name} is already in contacts`);
+        isAdded = true;
+      } else if (el.number === number) {
+        alert(`${number} is already in contacts`);
+        isAdded = true;
+      }
+    });
+
+    if (isAdded) {
+      return;
+    }
+    const contact = {
+      id: shortid.generate(),
+      name: name,
+      number: number,
+    };
+
+    setContacts(prevContacts => [...prevContacts, contact]);
+  };
+
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value.trim());
+  };
+
+  const getVisibleContacts = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  };
+
+  const deleteContact = todoId => {
+    setContacts(prevState =>
+      prevState.filter(contact => contact.id !== todoId)
+    );
+  };
+
+  const visibleContacts = getVisibleContacts();
+
   return (
     <div
       style={{
-        height: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
+        flexDirection: 'column',
+        fontSize: 18,
+        color: '#010101',
       }}
     >
-      React homework template
+      <h1>Phonebook</h1>
+      <ContactForm onSubmit={addContact} />
+
+      <h2 className={styles.titleContacts}>Contacts</h2>
+      <div className={styles.allContacts}>All contacts: {contacts.length}</div>
+
+      {contacts.length > 0 ? (
+        <>
+          <Filter value={filter} onChange={changeFilter} />
+          <ContactList
+            contacts={visibleContacts}
+            onDeleteContact={deleteContact}
+          />
+        </>
+      ) : (
+        <Notification message="There are no saved contacts in the phonebook, please add.." />
+      )}
     </div>
   );
-};
+}
