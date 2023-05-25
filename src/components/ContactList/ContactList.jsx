@@ -1,20 +1,28 @@
 import styles from './ContactList.module.css';
 import PropTypes from 'prop-types';
-import ContactItem from '../ContactItem/ContactItem';
+import ContactItem from '../ContactItem';
+import { useSelector } from 'react-redux';
+import { selectFilteredContacts } from 'redux/selectors';
+import Notification from 'components/Notification/Notification';
 
-const ContactList = ({ contacts, onDeleteContact }) => (
-  <ul className={styles.list}>
-    {contacts.map(contacts => (
-      <ContactItem
-        key={contacts.id}
-        id={contacts.id}
-        name={contacts.name}
-        number={contacts.number}
-        onDeleteContact={onDeleteContact}
-      />
-    ))}
-  </ul>
-);
+const ContactList = () => {
+  const contacts = useSelector(selectFilteredContacts);
+
+  if (contacts.length) {
+    return (
+      <ul className={styles.list}>
+        {contacts.map(contact => (
+          <ContactItem key={contact.id} {...contact} />
+        ))}
+      </ul>
+    );
+  }
+
+  return (
+    <Notification message="There are no saved contacts in the phonebook, please add.." />
+  );
+};
+
 ContactList.propTypes = {
   contacts: PropTypes.arrayOf(
     PropTypes.shape({
@@ -23,7 +31,6 @@ ContactList.propTypes = {
       number: PropTypes.string.isRequired,
     })
   ),
-  onDeleteContact: PropTypes.func.isRequired,
 };
 
 export default ContactList;

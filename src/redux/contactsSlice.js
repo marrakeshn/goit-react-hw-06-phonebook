@@ -3,25 +3,29 @@ import { createSlice } from '@reduxjs/toolkit'
 export const CONTACTS = 'contacts'
 
 const initialState = {
-  contacts: JSON.parse(localStorage.getItem(CONTACTS)) ?? [],
+  entities: [],
+  filter: '',
+  error: '',
 }
 
 export const contactsSlice = createSlice({
   name: CONTACTS,
-  initialState,
+  initialState: initialState,
   reducers: {
-    increment: (state) => {
-      state.contacts = [1]
+    addContact: (state, action) => {
+      state.entities.push(action.payload.contact)
     },
-    decrement: (state) => {
-      state.contacts = [0]
+    deleteContact: (state, action) => {
+      const contactId = action.payload.id;
+      const contactToRemoveIndex = state.entities.findIndex((contact) => contact.id === contactId);
+      state.entities.splice(contactToRemoveIndex, 1);
     },
-    incrementByAmount: (state, action) => {
-      state.contacts = action.payload
-    },
+    setFilter(state, action) {
+        state.filter = action.payload.toLowerCase();
+      },
   },
 })
 
-export const { increment, decrement, incrementByAmount } = contactsSlice.actions
+export const { addContact, deleteContact, setFilter } = contactsSlice.actions
 
-export default contactsSlice.reducer
+export const contactsReducer = contactsSlice.reducer
