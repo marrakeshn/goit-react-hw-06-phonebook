@@ -19,7 +19,7 @@ const ContactList = () => {
   }
 
   return (
-    <Notification message="There are no saved contacts in the phonebook, please add.." />
+    <Notification message="No saved contacts in the phonebook, please add.." />
   );
 };
 
